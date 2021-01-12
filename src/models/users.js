@@ -51,6 +51,28 @@ const model = {
                 }
             })
         })
+    },
+    update: (id, data) => {
+        return new Promise((resolve, reject) => {
+            db.query(`UPDATE users SET ? WHERE id = ?`, [data, id], (err, result) => {
+                if (err) {
+                    reject(new Error(err))
+                } else {
+                    resolve(result)
+                }
+            })
+        })
+    },
+    checkUserByID: (id) => {
+        return new Promise((resolve, reject) => {
+            db.query(`SELECT * FROM users WHERE id=${id}`, (err, result) => {
+                if (err) {
+                    reject(new Error(err))
+                } else {
+                    resolve(result)
+                }
+            })
+        })
     }
 }
 

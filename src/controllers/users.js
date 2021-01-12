@@ -70,6 +70,58 @@ const controller = {
             .catch((err) => {
                 Failed(res, [], err.message)
             })
+    },
+    update: (req, res) => {
+        image.single('image')(req, res, (err) => {
+            if (err) {
+                if (err.code === 'LIMIT_FILE_SIZE') {
+                    Failed(res, [], 'File too large')
+                } else {
+                    console.log(err)
+                }
+            } else {
+                const id = req.params.id
+                const body = req.body
+                model.checkUserByID(id) //check to model where id already exist
+                    .then((check) => {
+                        const Oldimage = check[0].image
+                        body.image = !req.file ? Oldimage : req.file.filename //jika tidak ada request file maka Oldimage
+                        if (body.image !== Oldimage) { // jika ganti image maka masuk ke kondisi bawah
+                            if (Oldimage !== 'default.png') { // jika imagenya lama bukan default
+                                fs.unlink(`src/uploads/${Oldimage}`, (err) => {
+                                    if (err) {
+                                        Failed(res, err,)
+                                    } else {
+                                        model.update(id, body)
+                                            .then((result) => { //gambar lama akan diganti dengan gambar baru tanpa menambah file
+                                                Success(res, result, 'Success update data')
+                                            })
+                                            .catch((err) => {
+                                                console.log(err)
+                                            })
+                                    }
+                                })
+                            } else {
+                                model.update(id, body)
+                                    .then((result) => {
+                                        Success(res, result, 'Success update data') // new Image
+                                    })
+                                    .catch((err) => {
+                                        console.log(err)
+                                    })
+                            }
+                        } else {
+                            model.update(id, body)
+                                .then((result) => {
+                                    Success(res, result, 'Success update data') //old Image
+                                })
+                                .catch((err) => {
+                                    console.log(err)
+                                })
+                        }
+                    })
+            }
+        })
     }
 }
 
