@@ -1,5 +1,7 @@
 const model = require('../models/users')
 const { Success, Failed } = require('../helpers/response')
+const image = require('../helpers/upload')
+const fs = require('fs')
 
 const controller = {
 
@@ -19,19 +21,28 @@ const controller = {
             })
     },
     insert: (req, res) => {
-        const data = req.body
-        if (!data.name || !data.mobile || !data.email || !data.address) {
-            Failed(res, [], 'cannot empty')
-        } else {
-            model.checkUser(data.email)
+        image.single('image')(req, res, (err) => {
+            if (err) {
+                if (err.code === 'LIMIT_FILE_SIZE') {
+                    Failed(res, [], 'File too large')
+                } else {
+                    console.log(err)
+                }
+            } else {
+                const body = req.body
+                if (!body.name || !body.mobile || !body.email || !body.address) {
+                    Failed(res, [], 'cannot empty')
+                } else {
+                    model.checkUser(body.email)
                 .then((result) => {
                     if (result.length === 0) {
                         const sendData = {
-                            name: data.name,
-                            mobile: data.mobile,
-                            email: data.email,
-                            address: data.address
+                            name: body.name,
+                            mobile: body.mobile,
+                            email: body.email,
+                            address: body.address
                         }
+                        body.image = !req.file ? 'default.png' : req.file.filename
                         model.insert(sendData)
                             .then((result) => {
                                 Success(res, result, 'Success insert data')
@@ -46,7 +57,9 @@ const controller = {
                 .catch((err) => {
                     Failed(res, [], err.message)
                 })
-        }
+                }
+            }
+        })
     }
 }
 
