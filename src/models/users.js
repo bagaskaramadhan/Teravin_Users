@@ -40,6 +40,17 @@ const model = {
                 }
             })
         })
+    },
+    remove: (id) => {
+        return new Promise((resolve, reject) => {
+            db.query(`DELETE FROM users WHERE id = ?`, id, (err, result) => {
+                if (err) {
+                    reject(new Error(err))
+                } else {
+                    resolve(result)
+                }
+            })
+        })
     }
 }
 

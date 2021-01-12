@@ -34,32 +34,42 @@ const controller = {
                     Failed(res, [], 'cannot empty')
                 } else {
                     model.checkUser(body.email)
-                .then((result) => {
-                    if (result.length === 0) {
-                        const sendData = {
-                            name: body.name,
-                            mobile: body.mobile,
-                            email: body.email,
-                            address: body.address
-                        }
-                        body.image = !req.file ? 'default.png' : req.file.filename
-                        model.insert(sendData)
-                            .then((result) => {
-                                Success(res, result, 'Success insert data')
-                            })
-                            .catch((err) => {
-                                Failed(res, [], err.message)
-                            })
-                    } else {
-                        Failed(res, [], 'Email has been taken')
-                    }
-                })
-                .catch((err) => {
-                    Failed(res, [], err.message)
-                })
+                        .then((result) => {
+                            if (result.length === 0) {
+                                const sendData = {
+                                    name: body.name,
+                                    mobile: body.mobile,
+                                    email: body.email,
+                                    address: body.address
+                                }
+                                body.image = !req.file ? 'default.png' : req.file.filename
+                                model.insert(sendData)
+                                    .then((result) => {
+                                        Success(res, result, 'Success insert data')
+                                    })
+                                    .catch((err) => {
+                                        Failed(res, [], err.message)
+                                    })
+                            } else {
+                                Failed(res, [], 'Email has been taken')
+                            }
+                        })
+                        .catch((err) => {
+                            Failed(res, [], err.message)
+                        })
                 }
             }
         })
+    },
+    remove: (req, res) => {
+        const id = req.params.id
+        model.remove(id)
+            .then((result) => {
+                Success(res, result, 'Success Delete Data')
+            })
+            .catch((err) => {
+                Failed(res, [], err.message)
+            })
     }
 }
 
