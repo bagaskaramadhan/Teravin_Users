@@ -122,6 +122,21 @@ const controller = {
                     })
             }
         })
+    },
+    checkUserByID: (req, res) => {
+        const id = req.params.id
+        model.checkUserByID(id)
+            .then((result) => {
+                const checkID = result[0]
+                if (checkID) {
+                    Success(res, result, 'Success Get Data By ID')
+                } else {
+                    NOT(res, [], 'Data Not Found')
+                }
+            })
+            .catch((err) => {
+                Failed(res, [], err.message)
+            })
     }
 }
 
